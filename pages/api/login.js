@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-const saltRounds = 10;
 
 export default function handler(req, res) {
+  const { name, password } = req?.body;
+
   const prisma = new PrismaClient();
 
   async function main() {
@@ -11,14 +12,15 @@ export default function handler(req, res) {
     await prisma.$connect();
     const user = await prisma.user.findUnique({
       where: {
-        name: 'kwandaoh',
+        name,
       },
     });
+    if (!user) return res.json('User not found');
     const hashedPassword = user.password;
-    const match = await bcrypt.compare('0899999999', hashedPassword);
+    const match = await bcrypt.compare(password, hashedPassword);
     if (match) {
       const token = jwt.sign(user, process.env.JWT_KEY);
-      res.status(200).json(token);
+      return res.status(200).json(token);
     }
     // const password = await bcrypt.hash('0899999999', saltRounds);
     // const user = await prisma.user.create({
@@ -27,7 +29,7 @@ export default function handler(req, res) {
     //     password,
     //   },
     // });
-    res.status(401).json('Unauthorized');
+    return res.status(401).json('Unauthorized');
 
     // ... you will write your Prisma Client queries here
   }
