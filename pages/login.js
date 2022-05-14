@@ -6,17 +6,27 @@ import {
   Input,
   VStack,
 } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-
+import AxiosInstance from '../lib/api';
 const Login = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const res = await AxiosInstance.post('api/login', data);
+      localStorage.setItem('token', res.data);
+      router.push('/');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Container maxW='container.md' mt='24'>
       <Center>
