@@ -7,10 +7,26 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import AxiosInstance from '../lib/api';
+if (typeof window !== 'undefined') {
+  AxiosInstance.defaults.headers.common = {
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  };
+}
 const Login = () => {
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await AxiosInstance.get('checkAuth');
+        router.push('/');
+      } catch (error) {
+        // router.push('/login');
+      }
+    };
+    fetch();
+  }, []);
   const router = useRouter();
   const {
     register,
@@ -19,9 +35,9 @@ const Login = () => {
   } = useForm();
   const onSubmit = async (data) => {
     try {
-      const res = await AxiosInstance.post('api/login', data);
+      const res = await AxiosInstance.post('/login', data);
       localStorage.setItem('token', res.data);
-      router.push('/');
+      router.reload();
     } catch (error) {
       console.log(error);
     }
