@@ -1,3 +1,4 @@
+import { Container } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import AxiosInstance from '../lib/api';
@@ -12,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await AxiosInstance.get('checkAuth');
+        const res = await AxiosInstance.get('/checkAuth');
         console.log(res.data);
       } catch (error) {
         router.push('/login');
@@ -22,9 +23,9 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      <h1>This is a home page</h1>
-    </div>
+    <Container maxW='container.lg'>
+      <h1>รายการหลักฐาน</h1>
+    </Container>
   );
 };
 
