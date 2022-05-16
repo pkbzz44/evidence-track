@@ -8,7 +8,39 @@ generator client {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String @unique
-  password String
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String @unique
+  password  String
+  evidences Evidence[]
+}
+
+model Evidence {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  receivedDate     String
+  evidenceId       String @unique
+  policeStation    String
+  stationNo        Int
+  packageId        String @unique
+  packageDate      DateTime
+  detectiveName    String
+  detectivePhone   String
+  itemsDescription String
+  storedAt         String
+  technique        String
+  LTName           String
+  isPolitic        Boolean
+  owner            User   @relation(fields: [ownerId], references: [id])
+  ownerId          String @db.ObjectId
+  recipientName    String
+  returnedDate     DateTime
+  remark           String
+  status           Status @default(pending)
+}
+
+enum Status {
+  pending
+  lab
+  locker
+  returned
+  deleted
 }
