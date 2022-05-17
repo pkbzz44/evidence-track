@@ -8,19 +8,19 @@ generator client {
 }
 
 model User {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  name      String @unique
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String     @unique
   password  String
   evidences Evidence[]
 }
 
 model Evidence {
-  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
   receivedDate     DateTime
-  evidenceId       String @unique
+  evidenceId       String   @unique
   policeStation    String
   stationNo        Int
-  packageId        String @unique
+  packageId        String   @unique
   packageDate      DateTime
   detectiveName    String
   detectivePhone   String
@@ -29,18 +29,19 @@ model Evidence {
   technique        String
   LTName           String
   isPolitic        Boolean
-  owner            User   @relation(fields: [ownerId], references: [id])
-  ownerId          String @db.ObjectId
+  owner            User     @relation(fields: [ownerId], references: [id])
+  ownerId          String   @db.ObjectId
   recipientName    String
   returnedDate     DateTime
   remark           String
-  status           Status @default(pending)
+  status           Status   @default(pending)
 }
 
 enum Status {
   pending
-  lab
-  locker
-  returned
-  deleted
+  labAll
+  labPartial
+  returnedAll
+  returnedPartial
+  other
 }
