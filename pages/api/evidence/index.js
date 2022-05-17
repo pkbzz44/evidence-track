@@ -5,8 +5,12 @@ export default function handler(req, res) {
 
   async function main() {
     await prisma.$connect();
-    const users = await prisma.evidence.findMany();
-    res.status(200).json(users);
+    const users = await prisma.evidence.findMany({
+      include: {
+        owner: true,
+      },
+    });
+    return res.status(200).json(users);
   }
 
   main()
