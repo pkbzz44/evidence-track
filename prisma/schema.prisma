@@ -15,26 +15,27 @@ model User {
 }
 
 model Evidence {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
   receivedDate     DateTime
-  evidenceId       String   @unique
+  evidenceId       String    @unique
   policeStation    String
-  stationNo        Int
-  packageId        String   @unique
+  division         Int
+  packageId        String    @unique
   packageDate      DateTime
   detectiveName    String
   detectivePhone   String
   itemsDescription String
   storedAt         String
-  technique        String
+  techniques       String[]
   LTName           String
-  isPolitic        Boolean
-  owner            User     @relation(fields: [ownerId], references: [id])
-  ownerId          String   @db.ObjectId
-  recipientName    String
-  returnedDate     DateTime
+  owner            User      @relation(fields: [ownerId], references: [id])
+  ownerId          String    @db.ObjectId
+  recipientName    String?
+  returnedDate     DateTime?
   remark           String
-  status           Status   @default(pending)
+  status           Status    @default(pending)
+  stationType      Int
+  important        Important @default(normal)
 }
 
 enum Status {
@@ -44,4 +45,12 @@ enum Status {
   returnedAll
   returnedPartial
   other
+}
+
+enum Important {
+  normal
+  politic
+  drugs
+  media
+  vip
 }
