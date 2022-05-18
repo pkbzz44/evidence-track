@@ -60,7 +60,7 @@ const NewEvidence = () => {
   };
 
   return (
-    <Container maxW='container.lg' mt='24'>
+    <Container maxW='container.lg' mt='24' mb='8'>
       <Center>
         <Heading mb='4'>สร้างรายการ</Heading>
       </Center>
