@@ -52,28 +52,28 @@ const Home = () => {
   return (
     <Container maxW={'container.lg'} mt='8'>
       <Heading mb='4'>รายการหลักฐาน</Heading>
-      <Flex justify={'end'}>
+      <Flex justify={'end'} mb='4'>
         <Link href='/new'>
           <Button colorScheme={'blue'}>สร้างรายการ</Button>
         </Link>
       </Flex>
       <TableContainer>
         <Table variant='striped' colorScheme={'teal'}>
-          <Thead>
+          <Thead bgColor='orange.500'>
             <Tr>
-              <Th>สถานะ</Th>
-              <Th>ก</Th>
-              <Th>วันที่รับของ</Th>
-              <Th>สน</Th>
-              <Th>เลขหนังสือนำส่ง</Th>
-              <Th>ลงวันที่</Th>
-              <Th>พงส</Th>
-              <Th>โทร พงส</Th>
-              <Th>รายการของกลาง</Th>
-              <Th>ตู้</Th>
-              <Th>เทคนิค</Th>
-              <Th>ร้อยเวร</Th>
-              <Th>ผู้ช่วย</Th>
+              <Th color='white'>สถานะ</Th>
+              <Th color='white'>เลข ก</Th>
+              <Th color='white'>วันที่รับของ</Th>
+              <Th color='white'>สน / สภ</Th>
+              <Th color='white'>เลขหนังสือนำส่ง</Th>
+              <Th color='white'>ลงวันที่</Th>
+              <Th color='white'>พนักงานสอบสวน</Th>
+              <Th color='white'>เบอร์โทรพนักงานสอบสวน</Th>
+              <Th color='white'>รายการของกลาง</Th>
+              <Th color='white'>ตู้</Th>
+              <Th color='white'>เทคนิค</Th>
+              <Th color='white'>ร้อยเวร</Th>
+              <Th color='white'>ผู้ช่วย</Th>
             </Tr>
           </Thead>
           <Tbody>

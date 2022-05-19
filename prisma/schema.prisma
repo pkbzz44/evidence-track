@@ -10,6 +10,7 @@ generator client {
 model User {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   name      String     @unique
+  fullName  String     @unique
   password  String
   evidences Evidence[]
 }
@@ -18,7 +19,7 @@ model Evidence {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   receivedDate     DateTime
   evidenceId       String    @unique
-  policeStation    String
+  policeStation    String?
   division         Int
   packageId        String    @unique
   packageDate      DateTime
@@ -36,6 +37,9 @@ model Evidence {
   status           Status    @default(pending)
   stationType      Int
   important        Important @default(normal)
+  //จังหวัด ของ สภ
+  province         String?
+  stationTypeOther String?
 }
 
 enum Status {

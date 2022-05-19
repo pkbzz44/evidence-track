@@ -13,13 +13,14 @@ import {
   Textarea,
   Checkbox,
   CheckboxGroup,
+  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import AxiosInstance from '../lib/api';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
-import { policeStation } from '../lib/helper/static';
+import { policeStation, provinces } from '../lib/helper/static';
 
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
@@ -27,6 +28,7 @@ if (typeof window !== 'undefined') {
   };
 }
 const NewEvidence = () => {
+  const toast = useToast();
   const [auth, setAuth] = useState(null);
   const [receivedDate, setReceivedDate] = useState(new Date());
   const [packageDate, setPackageDate] = useState(new Date());
@@ -48,6 +50,7 @@ const NewEvidence = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     watch,
   } = useForm();
@@ -62,6 +65,100 @@ const NewEvidence = () => {
       stationType: Number(stationType),
     };
     console.log(updatedData);
+    try {
+      const res = await AxiosInstance.post('/evidence/create', updatedData);
+      router.push('/');
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: 'เกิดเหตุผิดพลาด',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const renderStationOptions = () => {
+    if (stationType === '1') {
+      return (
+        <Select
+          placeholder='กรุณาเลือกสน'
+          {...register('policeStation')}
+          onChange={(e) => {
+            const division = e.target.value.split(' - ')[1];
+            setDivision(division);
+          }}
+        >
+          {policeStation.map((name) => {
+            return (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            );
+          })}
+        </Select>
+      );
+    } else if (stationType === '2') {
+      return (
+        <>
+          <Select
+            placeholder='กรุณาเลือกจังหวัด'
+            {...register('province')}
+            onChange={(e) => {
+              setDivision(0);
+            }}
+          >
+            {provinces
+              .sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'))
+              .map(({ name_th, name_en }) => {
+                return (
+                  <option key={name_en} value={name_en}>
+                    {name_th}
+                  </option>
+                );
+              })}
+          </Select>
+          <Text>ชื่อ สภ.</Text>
+          <Input
+            placeholder='กรุณากรอกชื่อสภ'
+            {...register('policeStation', {
+              required: stationType === '2',
+            })}
+          />
+        </>
+      );
+    } else if (stationType === '3') {
+      return (
+        <>
+          <Select
+            placeholder='กรุณาเลือกหน่วยงาน'
+            {...register('stationTypeOther')}
+            onChange={(e) => {
+              setValue('stationTypeOther', e.target.value);
+              setDivision(0);
+              setValue('policeStation', e.target.value);
+            }}
+          >
+            <option value='drug-1'>กองบัญชาการตำรวจปราบปรามยาเสพติด 1</option>
+            <option value='drug-2'>กองบัญชาการตำรวจปราบปรามยาเสพติด 2</option>
+            <option value='drug-3'>กองบัญชาการตำรวจปราบปรามยาเสพติด 3</option>
+            <option value='drug-4'>กองบัญชาการตำรวจปราบปรามยาเสพติด 4</option>
+            <option value='etc'>อื่นๆ</option>
+          </Select>
+          {watch('stationTypeOther') === 'etc' && (
+            <>
+              <Text>หน่วยงานอื่นๆ</Text>
+
+              <Input
+                placeholder='กรุณากรอกชื่อหน่วยงาน'
+                {...register('stationTypeOtherInput')}
+              />
+            </>
+          )}
+        </>
+      );
+    }
   };
 
   return (
@@ -70,12 +167,13 @@ const NewEvidence = () => {
         <Heading mb='4'>สร้างรายการ</Heading>
       </Center>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack align='start'>
+        <VStack align='start' spacing='4'>
           <Text>สถานะ</Text>
           <Select
             isInvalid={errors.status}
             errorBorderColor='crimson'
-            placeholder='กรุณาเลือกสถานะ'
+            defaultValue={'pending'}
+            // placeholder='กรุณาเลือกสถานะ'
             {...register('status', { required: true })}
           >
             <option value='pending'>ยังไม่ได้คืน</option>
@@ -91,8 +189,8 @@ const NewEvidence = () => {
               {...register('otherName')}
             />
           )}
-          <Text>ก</Text>
-          <Input placeholder='ก' {...register('evidenceId')} />
+          <Text>เลข ก</Text>
+          <Input placeholder='กรุณากรอกเลข ก' {...register('evidenceId')} />
           <Text>วันที่รับของ</Text>
           <DatePicker
             locale='th-TH'
@@ -110,43 +208,35 @@ const NewEvidence = () => {
               <Radio value='3'>อื่นๆ</Radio>
             </HStack>
           </RadioGroup>
-          {stationType === '1' && (
-            <Select
-              placeholder='กรุณาเลือกสน'
-              {...register('policeStation')}
-              onChange={(e) => {
-                const division = e.target.value.split(' - ')[1];
-                setDivision(division);
-              }}
-            >
-              {policeStation.map((name) => {
-                return (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                );
-              })}
-            </Select>
-          )}
+          {renderStationOptions()}
           <Text>เลขหนังสือนำส่ง</Text>
-          <Input placeholder='เลขหนังสือนำส่ง' {...register('packageId')} />
+          <Input
+            placeholder='กรุณากรอกเลขหนังสือนำส่ง'
+            {...register('packageId')}
+          />
           <Text>ลงวันที่</Text>
           <DatePicker
             locale='th-TH'
             onChange={(date) => setPackageDate(date)}
             value={packageDate}
           />
-          <Text>พงส</Text>
-          <Input placeholder='พงส' {...register('detectiveName')} />
-          <Text>โทร พงส.</Text>
-          <Input placeholder='โทร พงส.' {...register('detectivePhone')} />
+          <Text>พนักงานสอบสวน</Text>
+          <Input
+            placeholder='กรุณากรอกชื่อพนักงานสอบสวน'
+            {...register('detectiveName')}
+          />
+          <Text>หมายเลขโทรศัพท์พนักงานสอบสวน</Text>
+          <Input
+            placeholder='กรุณากรอกหมายเลขโทรศัพท์'
+            {...register('detectivePhone')}
+          />
           <Text>รายการของกลาง</Text>
           <Textarea
             placeholder='รายการของกลาง'
             {...register('itemsDescription')}
           />
           <Text>ตู้</Text>
-          <Input placeholder='ตู้' {...register('storedAt')} />
+          <Input placeholder='กรุณากรอกตู้' {...register('storedAt')} />
           <Text>เทคนิค</Text>
           <CheckboxGroup
             onChange={(value) => setTechniques(value)}
@@ -170,9 +260,9 @@ const NewEvidence = () => {
             </HStack>
           </CheckboxGroup>
           <Text>ร้อยเวร</Text>
-          <Input placeholder='ร้อยเวร' {...register('LTName')} />
+          <Input placeholder='กรุณากรอกชื่อร้อยเวร' {...register('LTName')} />
           <Text>ผู้ช่วย</Text>
-          <Input placeholder='ผู้ช่วย' defaultValue={auth?.name} disabled />
+          <Input placeholder='ผู้ช่วย' defaultValue={auth?.fullName} disabled />
           <Text>ความสำคัญ</Text>
           <Select
             isInvalid={errors.important}
