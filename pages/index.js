@@ -12,7 +12,10 @@ import {
   Heading,
   Flex,
   Button,
+  Text,
+  HStack,
 } from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import AxiosInstance from '../lib/api';
@@ -49,6 +52,25 @@ const Home = () => {
     fetchEvidences();
   }, []);
 
+  const renderStatus = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'ยังไม่ได้คืน';
+      case 'labAll':
+        return 'ส่งต่องานแฝง (ทั้งหมด)';
+      case 'labPartial':
+        return 'ส่งต่องานแฝง (บางส่วน)';
+      case 'returnedAll':
+        return <Text color='red.500'>คืน พงส. แล้ว (ทั้งหมด)</Text>;
+      case 'returnedPartial':
+        return 'คืน พงส. แล้ว (บางส่วน)';
+      case 'other':
+        return 'ส่งต่อกลุ่มงานอื่นๆ';
+      default:
+        break;
+    }
+  };
+
   return (
     <Container maxW={'container.lg'} mt='8'>
       <Heading mb='4'>รายการหลักฐาน</Heading>
@@ -58,9 +80,10 @@ const Home = () => {
         </Link>
       </Flex>
       <TableContainer>
-        <Table variant='striped' colorScheme={'teal'}>
+        <Table variant='striped' colorScheme='twitter'>
           <Thead bgColor='orange.500'>
             <Tr>
+              <Th color='white'></Th>
               <Th color='white'>สถานะ</Th>
               <Th color='white'>เลข ก</Th>
               <Th color='white'>วันที่รับของ</Th>
@@ -96,7 +119,13 @@ const Home = () => {
               }) => (
                 <>
                   <Tr key={id}>
-                    <Td>{status}</Td>
+                    <Td>
+                      <HStack>
+                        <EditIcon onClick={() => router.push(`/${id}/edit`)} />
+                        <DeleteIcon />
+                      </HStack>
+                    </Td>
+                    <Td>{renderStatus(status)}</Td>
                     <Td>{evidenceId}</Td>
                     <Td>{dayjs(receivedDate).format('DD/MM/YY')}</Td>
                     <Td>{policeStation}</Td>
