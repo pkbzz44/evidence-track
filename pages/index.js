@@ -3,21 +3,27 @@ import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   Heading,
   Flex,
   Button,
   Text,
   HStack,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  useToast,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import AxiosInstance from '../lib/api';
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -29,7 +35,18 @@ if (typeof window !== 'undefined') {
 }
 
 const Home = () => {
+  const toast = useToast();
+  const cancelRef = useRef();
+  const {
+    isOpen: isDeleteDialogOpen,
+    onOpen: onOpenDeleteDialog,
+    onClose: onCloseDeleteDialog,
+  } = useDisclosure();
   const [evidences, setEvidences] = useState([]);
+  const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const router = useRouter();
+
+  // Methods
   const fetchEvidences = async () => {
     try {
       const res = await AxiosInstance.get('/evidence');
@@ -39,7 +56,11 @@ const Home = () => {
     }
   };
 
-  const router = useRouter();
+  const handleDelete = (evidence) => {
+    setSelectedEvidence(evidence);
+    onOpenDeleteDialog();
+  };
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -66,6 +87,8 @@ const Home = () => {
         return 'คืน พงส. แล้ว (บางส่วน)';
       case 'other':
         return 'ส่งต่อกลุ่มงานอื่นๆ';
+      case 'deleted':
+        return 'ถูกลบ';
       default:
         break;
     }
@@ -100,8 +123,8 @@ const Home = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {evidences.map(
-              ({
+            {evidences.map((evidence) => {
+              const {
                 id,
                 evidenceId,
                 receivedDate,
@@ -116,13 +139,20 @@ const Home = () => {
                 technique,
                 status,
                 owner,
-              }) => (
+              } = evidence;
+              return (
                 <>
                   <Tr key={id}>
                     <Td>
                       <HStack>
-                        <EditIcon onClick={() => router.push(`/${id}/edit`)} />
-                        <DeleteIcon />
+                        <EditIcon
+                          cursor='pointer'
+                          onClick={() => router.push(`/${id}/edit`)}
+                        />
+                        <DeleteIcon
+                          cursor='pointer'
+                          onClick={() => handleDelete(evidence)}
+                        />
                       </HStack>
                     </Td>
                     <Td>{renderStatus(status)}</Td>
@@ -140,8 +170,8 @@ const Home = () => {
                     <Td>{owner.name}</Td>
                   </Tr>
                 </>
-              )
-            )}
+              );
+            })}
           </Tbody>
           {/* <Tfoot>
             <Tr>
@@ -152,6 +182,49 @@ const Home = () => {
           </Tfoot> */}
         </Table>
       </TableContainer>
+      <AlertDialog isOpen={isDeleteDialogOpen} onClose={onCloseDeleteDialog}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              ลบรายการนี้
+            </AlertDialogHeader>
+            <AlertDialogBody>คุณแน่ใจที่จะลบรายการนี้?</AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onCloseDeleteDialog}>
+                ยกเลิก
+              </Button>
+              <Button
+                colorScheme='red'
+                onClick={async () => {
+                  try {
+                    await AxiosInstance.delete(
+                      `evidence/${selectedEvidence.id}/del`
+                    );
+                    onCloseDeleteDialog();
+                    toast({
+                      title: 'ลบสำเร็จ',
+                      status: 'success',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                    fetchEvidences();
+                  } catch (error) {
+                    toast({
+                      title: 'ลบล้มเหลว',
+                      status: 'error',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  }
+                }}
+                ml={3}
+              >
+                ลบรายการนี้
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Container>
   );
 };

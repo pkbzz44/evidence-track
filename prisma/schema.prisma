@@ -49,6 +49,7 @@ enum Status {
   returnedAll
   returnedPartial
   other
+  deleted
 }
 
 enum Important {
