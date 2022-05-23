@@ -14,6 +14,7 @@ import {
   Checkbox,
   CheckboxGroup,
   useToast,
+  Skeleton,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -28,6 +29,8 @@ if (typeof window !== 'undefined') {
   };
 }
 const EditEvidence = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const toast = useToast();
   const [auth, setAuth] = useState(null);
   const [receivedDate, setReceivedDate] = useState(new Date());
@@ -35,6 +38,16 @@ const EditEvidence = () => {
   const [techniques, setTechniques] = useState([]);
   const [stationType, setStationType] = useState('1');
   const [division, setDivision] = useState(null);
+  const [evidence, setEvidence] = useState(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    watch,
+    reset,
+  } = useForm({});
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -46,14 +59,27 @@ const EditEvidence = () => {
     };
     fetch();
   }, []);
-  const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    watch,
-  } = useForm();
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (router.query.id) {
+        try {
+          const evidenceRes = await AxiosInstance.get(
+            `evidence/${router.query.id}`
+          );
+          setEvidence(evidenceRes.data);
+          setIsLoading(false);
+        } catch (error) {}
+      }
+    };
+    fetch();
+  }, [router]);
+
+  useEffect(() => {
+    reset(evidence);
+    setStationType(evidence?.stationType.toString());
+    setTechniques(evidence?.techniques);
+  }, [evidence]);
 
   const onSubmit = async (data) => {
     const updatedData = {
@@ -64,9 +90,15 @@ const EditEvidence = () => {
       packageDate,
       stationType: Number(stationType),
     };
-    console.log(updatedData);
+    delete updatedData.id;
     try {
-      const res = await AxiosInstance.post('/evidence/create', updatedData);
+      await AxiosInstance.patch(`/evidence/${router.query.id}`, updatedData);
+      toast({
+        title: 'แก้ไขสำเร็จ',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
       router.push('/');
     } catch (error) {
       console.log(error);
@@ -161,6 +193,8 @@ const EditEvidence = () => {
     }
   };
 
+  if (isLoading) return <Skeleton />;
+
   return (
     <Container maxW='container.lg' mt='24' mb='8'>
       <Center>
@@ -243,6 +277,7 @@ const EditEvidence = () => {
             placeholder='กรุณาเลือกเทคนิค'
             isInvalid={errors.technique}
             errorBorderColor='crimson'
+            value={techniques}
           >
             <HStack>
               <Checkbox value='Superglue'>Superglue</Checkbox>

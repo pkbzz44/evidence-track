@@ -15,6 +15,11 @@ export default function handler(req, res) {
   async function main() {
     await prisma.$connect();
     const users = await prisma.evidence.findMany({
+      where: {
+        status: {
+          not: 'deleted',
+        },
+      },
       include: {
         owner: true,
       },
