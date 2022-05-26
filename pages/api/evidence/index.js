@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 export default function handler(req, res) {
+  const { evidenceId } = req?.query;
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
   try {
@@ -14,17 +15,26 @@ export default function handler(req, res) {
 
   async function main() {
     await prisma.$connect();
-    const users = await prisma.evidence.findMany({
-      where: {
-        status: {
-          not: 'deleted',
+    try {
+      const users = await prisma.evidence.findMany({
+        where: {
+          evidenceId: evidenceId || undefined,
+          status: {
+            not: 'deleted',
+          },
         },
-      },
-      include: {
-        owner: true,
-      },
-    });
-    return res.status(200).json(users);
+        include: {
+          owner: true,
+        },
+      });
+      if (users.length === 0) return res.status(404).json('not found');
+      return res.status(200).json({
+        count: users.length,
+        data: users,
+      });
+    } catch (error) {
+      return res.status(500).json('invalid id');
+    }
   }
 
   main()

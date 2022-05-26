@@ -22,14 +22,23 @@ import {
   useToast,
   Skeleton,
   VStack,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Tfoot,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 import AxiosInstance from '../lib/api';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import Head from 'next/head';
+import { set } from 'date-fns';
 
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
@@ -48,17 +57,37 @@ const Home = () => {
   } = useDisclosure();
   const [evidences, setEvidences] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const [evidenceSearchId, setEvidenceSearchId] = useState('');
   const router = useRouter();
 
   // Methods
   const fetchEvidences = async () => {
     try {
-      const res = await AxiosInstance.get('/evidence');
-      setEvidences(res.data);
+      const res = await AxiosInstance.get('/evidence', {
+        params: {
+          evidenceId: evidenceSearchId !== '' ? evidenceSearchId : null,
+        },
+      });
+      setEvidences(res.data.data);
       setIsLoading(false);
     } catch (error) {
+      setEvidences([]);
       console.log(error);
     }
+  };
+
+  // const fetchEvidences = async () => {
+  //   try {
+  //     const res = await AxiosInstance.get('/evidence');
+  //     setEvidences(res.data.data);
+  //     setIsLoading(false);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const handleOnClickSearch = () => {
+    fetchEvidences();
   };
 
   const handleDelete = (evidence) => {
@@ -113,11 +142,25 @@ const Home = () => {
       </Head>
       <Container maxW={'container.xl'} mt='8'>
         <Heading mb='4'>รายการหลักฐาน</Heading>
-        <Flex justify={'end'} mb='4'>
+        <Flex justify='end' mb='8'>
           <Link href='/new'>
             <Button colorScheme={'blue'}>สร้างรายการ</Button>
           </Link>
         </Flex>
+        <HStack justify='space-between' mb='4'>
+          <InputGroup>
+            <InputLeftElement pointerEvents='none' children={<SearchIcon />} />
+            <Input
+              onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}
+              placeholder='กรอกรหัสเพื่อต้นหา'
+              value={evidenceSearchId}
+              onChange={(e) => setEvidenceSearchId(e.target.value)}
+            />
+          </InputGroup>
+          <Button colorScheme='green' onClick={handleOnClickSearch}>
+            ค้นหา
+          </Button>
+        </HStack>
         <TableContainer>
           <Table variant='striped' colorScheme='twitter'>
             <Thead bgColor='orange.500'>
@@ -189,15 +232,17 @@ const Home = () => {
                 );
               })}
             </Tbody>
-            {/* <Tfoot>
-            <Tr>
-              <Th>To convert</Th>
-              <Th>into</Th>
-              <Th isNumeric>multiply by</Th>
-            </Tr>
-          </Tfoot> */}
           </Table>
         </TableContainer>
+        {evidences.length === 0 && (
+          <Alert status='error' w='100%'>
+            <AlertIcon />
+            <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
+            <AlertDescription>
+              ไม่พบรายการที่ค้นหา หรือระบบขัดข้อง กรุณาลองใหม่
+            </AlertDescription>
+          </Alert>
+        )}
         <AlertDialog isOpen={isDeleteDialogOpen} onClose={onCloseDeleteDialog}>
           <AlertDialogOverlay>
             <AlertDialogContent>
