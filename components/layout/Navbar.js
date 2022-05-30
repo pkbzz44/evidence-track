@@ -21,22 +21,25 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from '@chakra-ui/icons';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
+  const router = useRouter();
 
   return (
     <Box>
       <Flex
         bg={useColorModeValue('white', 'gray.800')}
         color={useColorModeValue('gray.600', 'white')}
-        minH={'60px'}
+        minH='60px'
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
-        borderStyle={'solid'}
+        borderStyle='solid'
         borderColor={useColorModeValue('gray.200', 'gray.900')}
-        align={'center'}
+        align='center'
       >
         <Flex
           flex={{ base: 1, md: 'auto' }}
@@ -48,8 +51,8 @@ export default function Navbar() {
             icon={
               isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
             }
-            variant={'ghost'}
-            aria-label={'Toggle Navigation'}
+            variant='ghost'
+            aria-label='Toggle Navigation'
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
@@ -66,23 +69,28 @@ export default function Navbar() {
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={'flex-end'}
-          direction={'row'}
-          spacing={6}
-        >
-          <Button
-            as='a'
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize={'sm'}
-            fontWeight={600}
-            href={'/logout'}
-            colorScheme='red'
+        {router.pathname !== '/login' && (
+          <Stack
+            flex={{ base: 1, md: 0 }}
+            justify='flex-end'
+            direction='row'
+            spacing={6}
           >
-            ออกจากระบบ
-          </Button>
-        </Stack>
+            <Button
+              as='a'
+              display={{ base: 'none', md: 'inline-flex' }}
+              fontSize='sm'
+              fontWeight={600}
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+              colorScheme='red'
+            >
+              ออกจากระบบ
+            </Button>
+          </Stack>
+        )}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
@@ -92,93 +100,96 @@ export default function Navbar() {
   );
 }
 
-const DesktopNav = () => {
+function DesktopNav() {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+  const router = useRouter();
 
   return (
-    <Stack direction={'row'} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? '#'}
-                fontSize={'sm'}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
+    <Stack direction='row' spacing={4} alignItems='center'>
+      <Image src='/images/logo.png' width='65px' height='65px' />
+      {router.pathname !== '/login' &&
+        NAV_ITEMS.map((navItem) => (
+          <Box key={navItem.label}>
+            <Popover trigger='hover' placement='bottom-start'>
+              <PopoverTrigger>
+                <Link
+                  p={2}
+                  href={navItem.href ?? '#'}
+                  fontSize='sm'
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}
+                >
+                  {navItem.label}
+                </Link>
+              </PopoverTrigger>
 
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={'xl'}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={'xl'}
-                minW={'sm'}
-              >
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
-        </Box>
-      ))}
+              {navItem.children && (
+                <PopoverContent
+                  border={0}
+                  boxShadow='xl'
+                  bg={popoverContentBgColor}
+                  p={4}
+                  rounded='xl'
+                  minW='sm'
+                >
+                  <Stack>
+                    {navItem.children.map((child) => (
+                      <DesktopSubNav key={child.label} {...child} />
+                    ))}
+                  </Stack>
+                </PopoverContent>
+              )}
+            </Popover>
+          </Box>
+        ))}
     </Stack>
   );
-};
+}
 
-const DesktopSubNav = ({ label, href, subLabel }) => {
+function DesktopSubNav({ label, href, subLabel }) {
   return (
     <Link
       href={href}
-      role={'group'}
-      display={'block'}
+      role='group'
+      display='block'
       p={2}
-      rounded={'md'}
+      rounded='md'
       _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}
     >
-      <Stack direction={'row'} align={'center'}>
+      <Stack direction='row' align='center'>
         <Box>
           <Text
-            transition={'all .3s ease'}
+            transition='all .3s ease'
             _groupHover={{ color: 'pink.400' }}
             fontWeight={500}
           >
             {label}
           </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
+          <Text fontSize='sm'>{subLabel}</Text>
         </Box>
         <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
+          transition='all .3s ease'
+          transform='translateX(-10px)'
           opacity={0}
           _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
+          justify='flex-end'
+          align='center'
           flex={1}
         >
-          <Icon color={'pink.400'} w={5} h={5} as={ChevronRightIcon} />
+          <Icon color='pink.400' w={5} h={5} as={ChevronRightIcon} />
         </Flex>
       </Stack>
     </Link>
   );
-};
+}
 
-const MobileNav = () => {
+function MobileNav() {
   return (
     <Stack
       bg={useColorModeValue('white', 'gray.800')}
@@ -190,9 +201,9 @@ const MobileNav = () => {
       ))}
     </Stack>
   );
-};
+}
 
-const MobileNavItem = ({ label, children, href }) => {
+function MobileNavItem({ label, children, href }) {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -201,8 +212,8 @@ const MobileNavItem = ({ label, children, href }) => {
         py={2}
         as={Link}
         href={href ?? '#'}
-        justify={'space-between'}
-        align={'center'}
+        justify='space-between'
+        align='center'
         _hover={{
           textDecoration: 'none',
         }}
@@ -216,7 +227,7 @@ const MobileNavItem = ({ label, children, href }) => {
         {children && (
           <Icon
             as={ChevronDownIcon}
-            transition={'all .25s ease-in-out'}
+            transition='all .25s ease-in-out'
             transform={isOpen ? 'rotate(180deg)' : ''}
             w={6}
             h={6}
@@ -229,9 +240,9 @@ const MobileNavItem = ({ label, children, href }) => {
           mt={2}
           pl={4}
           borderLeft={1}
-          borderStyle={'solid'}
+          borderStyle='solid'
           borderColor={useColorModeValue('gray.200', 'gray.700')}
-          align={'start'}
+          align='start'
         >
           {children &&
             children.map((child) => (
@@ -243,7 +254,7 @@ const MobileNavItem = ({ label, children, href }) => {
       </Collapse>
     </Stack>
   );
-};
+}
 
 const NAV_ITEMS = [
   {
@@ -253,5 +264,9 @@ const NAV_ITEMS = [
   {
     label: 'สร้างรายการ',
     href: '/new',
+  },
+  {
+    label: 'ค้นหาขั้นสูง',
+    href: '/search',
   },
 ];

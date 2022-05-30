@@ -8,7 +8,7 @@ import {
   Td,
   TableContainer,
   Heading,
-  Flex,
+  Box,
   Button,
   Text,
   HStack,
@@ -25,19 +25,19 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Tfoot,
+  Stack,
   Alert,
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Radio,
+  RadioGroup,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 import dayjs from 'dayjs';
-import Link from 'next/link';
 import Head from 'next/head';
-import { set } from 'date-fns';
 import AxiosInstance from '../lib/api';
 
 if (typeof window !== 'undefined') {
@@ -46,8 +46,8 @@ if (typeof window !== 'undefined') {
   };
 }
 
-function Home() {
-  const [isLoading, setIsLoading] = useState(true);
+function AdvancedSearch() {
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const cancelRef = useRef();
   const {
@@ -58,6 +58,8 @@ function Home() {
   const [evidences, setEvidences] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [evidenceSearchId, setEvidenceSearchId] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [evidenceType, setEvidenceType] = useState(null);
   const router = useRouter();
 
   // Methods
@@ -75,16 +77,6 @@ function Home() {
       console.log(error);
     }
   };
-
-  // const fetchEvidences = async () => {
-  //   try {
-  //     const res = await AxiosInstance.get('/evidence');
-  //     setEvidences(res.data.data);
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const handleOnClickSearch = () => {
     fetchEvidences();
@@ -104,7 +96,7 @@ function Home() {
       }
     };
     fetch();
-    fetchEvidences();
+    // fetchEvidences();
   }, []);
 
   const renderStatus = (status) => {
@@ -148,92 +140,107 @@ function Home() {
             <Button colorScheme={'blue'}>สร้างรายการ</Button>
           </Link>
         </Flex> */}
-        <HStack justify='space-between' mb='4'>
-          <InputGroup>
-            <InputLeftElement pointerEvents='none' children={<SearchIcon />} />
-            <Input
-              onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}
-              placeholder='กรอกรหัสเพื่อค้นหา'
-              value={evidenceSearchId}
-              onChange={(e) => setEvidenceSearchId(e.target.value)}
-            />
-          </InputGroup>
-          <Button colorScheme='green' onClick={handleOnClickSearch}>
-            ค้นหา
-          </Button>
-        </HStack>
-        <TableContainer>
-          <Table variant='striped' colorScheme='twitter'>
-            <Thead bgColor='orange.500'>
-              <Tr>
-                <Th color='white' />
-                <Th color='white'>สถานะ</Th>
-                <Th color='white'>เลข ก</Th>
-                <Th color='white'>วันที่รับของ</Th>
-                <Th color='white'>สน / สภ</Th>
-                <Th color='white'>เลขหนังสือนำส่ง</Th>
-                <Th color='white'>ลงวันที่</Th>
-                <Th color='white'>พนักงานสอบสวน</Th>
-                <Th color='white'>เบอร์โทรพนักงานสอบสวน</Th>
-                <Th color='white'>รายการของกลาง</Th>
-                <Th color='white'>ตู้</Th>
-                <Th color='white'>เทคนิค</Th>
-                <Th color='white'>ร้อยเวร</Th>
-                <Th color='white'>ผู้ช่วย</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {evidences.map((evidence) => {
-                const {
-                  id,
-                  evidenceId,
-                  receivedDate,
-                  policeStation,
-                  packageId,
-                  packageDate,
-                  detectiveName,
-                  detectivePhone,
-                  itemsDescription,
-                  storedAt,
-                  LTName,
-                  technique,
-                  status,
-                  owner,
-                } = evidence;
-                return (
-                  <Tr key={id}>
-                    <Td>
-                      <HStack>
-                        <EditIcon
-                          cursor='pointer'
-                          onClick={() => router.push(`/${id}/edit`)}
-                        />
-                        <DeleteIcon
-                          cursor='pointer'
-                          onClick={() => handleDelete(evidence)}
-                        />
-                      </HStack>
-                    </Td>
-                    <Td>{renderStatus(status)}</Td>
-                    <Td>{evidenceId}</Td>
-                    <Td>{dayjs(receivedDate).format('DD/MM/YY')}</Td>
-                    <Td>{policeStation}</Td>
-                    <Td>{packageId}</Td>
-                    <Td>{dayjs(packageDate).format('DD/MM/YY')}</Td>
-                    <Td>{detectiveName}</Td>
-                    <Td>{detectivePhone}</Td>
-                    <Td>{itemsDescription}</Td>
-                    <Td>{storedAt}</Td>
-                    <Td>{technique}</Td>
-                    <Td>{LTName}</Td>
-                    <Td>{owner.name}</Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
-        {evidences.length === 0 && (
+        <VStack alignItems='start'>
+          <RadioGroup onChange={setEvidenceType} value={evidenceType}>
+            <Stack direction='row'>
+              <Radio value='1'>สภ.</Radio>
+              <Radio value='2'>สน.</Radio>
+              <Radio value='3'>อื่นๆ</Radio>
+            </Stack>
+          </RadioGroup>
+          <HStack justify='space-between' mb='4' w='100%'>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents='none'
+                children={<SearchIcon />}
+              />
+              <Input
+                onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}
+                placeholder='กรอกรหัสเพื่อค้นหา'
+                value={evidenceSearchId}
+                onChange={(e) => setEvidenceSearchId(e.target.value)}
+              />
+            </InputGroup>
+            <Button colorScheme='green' onClick={handleOnClickSearch}>
+              ค้นหา
+            </Button>
+          </HStack>
+        </VStack>
+
+        {hasSearched && (
+          <TableContainer>
+            <Table variant='striped' colorScheme='twitter'>
+              <Thead bgColor='orange.500'>
+                <Tr>
+                  <Th color='white' />
+                  <Th color='white'>สถานะ</Th>
+                  <Th color='white'>เลข ก</Th>
+                  <Th color='white'>วันที่รับของ</Th>
+                  <Th color='white'>สน / สภ</Th>
+                  <Th color='white'>เลขหนังสือนำส่ง</Th>
+                  <Th color='white'>ลงวันที่</Th>
+                  <Th color='white'>พนักงานสอบสวน</Th>
+                  <Th color='white'>เบอร์โทรพนักงานสอบสวน</Th>
+                  <Th color='white'>รายการของกลาง</Th>
+                  <Th color='white'>ตู้</Th>
+                  <Th color='white'>เทคนิค</Th>
+                  <Th color='white'>ร้อยเวร</Th>
+                  <Th color='white'>ผู้ช่วย</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {evidences.map((evidence) => {
+                  const {
+                    id,
+                    evidenceId,
+                    receivedDate,
+                    policeStation,
+                    packageId,
+                    packageDate,
+                    detectiveName,
+                    detectivePhone,
+                    itemsDescription,
+                    storedAt,
+                    LTName,
+                    technique,
+                    status,
+                    owner,
+                  } = evidence;
+                  return (
+                    <Tr key={id}>
+                      <Td>
+                        <HStack>
+                          <EditIcon
+                            cursor='pointer'
+                            onClick={() => router.push(`/${id}/edit`)}
+                          />
+                          <DeleteIcon
+                            cursor='pointer'
+                            onClick={() => handleDelete(evidence)}
+                          />
+                        </HStack>
+                      </Td>
+                      <Td>{renderStatus(status)}</Td>
+                      <Td>{evidenceId}</Td>
+                      <Td>{dayjs(receivedDate).format('DD/MM/YY')}</Td>
+                      <Td>{policeStation}</Td>
+                      <Td>{packageId}</Td>
+                      <Td>{dayjs(packageDate).format('DD/MM/YY')}</Td>
+                      <Td>{detectiveName}</Td>
+                      <Td>{detectivePhone}</Td>
+                      <Td>{itemsDescription}</Td>
+                      <Td>{storedAt}</Td>
+                      <Td>{technique}</Td>
+                      <Td>{LTName}</Td>
+                      <Td>{owner.name}</Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        )}
+        {evidences.length === 0 && hasSearched && (
           <Alert status='error' w='100%'>
             <AlertIcon />
             <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
@@ -290,4 +297,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default AdvancedSearch;
