@@ -8,6 +8,7 @@ export default function handler(req, res) {
     status,
     receivedStartDate,
     receivedEndDate,
+    policeStation,
   } = req?.query || {};
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
@@ -42,6 +43,7 @@ export default function handler(req, res) {
             not: 'deleted',
           },
           receivedDate: receivedDateQuery(),
+          policeStation: policeStation || undefined,
         },
         include: {
           owner: true,

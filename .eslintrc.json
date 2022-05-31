@@ -3,6 +3,10 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": "off",
-    "jsx-quotes": "off"
+    "jsx-quotes": "off",
+    "no-shadow": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "import/prefer-default-export": "off"
+
   }
 }

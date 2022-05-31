@@ -8,7 +8,6 @@ import {
   Td,
   TableContainer,
   Heading,
-  Flex,
   Button,
   Text,
   HStack,
@@ -25,7 +24,6 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Tfoot,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -35,9 +33,8 @@ import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 import dayjs from 'dayjs';
-import Link from 'next/link';
 import Head from 'next/head';
-import { set } from 'date-fns';
+import { renderPoliceStation } from '../lib/helper';
 import AxiosInstance from '../lib/api';
 
 if (typeof window !== 'undefined') {
@@ -135,21 +132,6 @@ function Home() {
       </VStack>
     );
   }
-
-  const renderPoliceStation = (s) => {
-    switch (s) {
-      case 'drug-1':
-        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 1';
-      case 'drug-2':
-        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 2';
-      case 'drug-3':
-        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 3';
-      case 'drug-4':
-        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 4';
-      default:
-        return s;
-    }
-  };
 
   return (
     <>

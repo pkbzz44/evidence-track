@@ -28,6 +28,7 @@ if (typeof window !== 'undefined') {
   };
 }
 function NewEvidence() {
+  const router = useRouter();
   const toast = useToast();
   const [auth, setAuth] = useState(null);
   const [receivedDate, setReceivedDate] = useState(new Date());
@@ -46,7 +47,6 @@ function NewEvidence() {
     };
     fetch();
   }, []);
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -66,7 +66,7 @@ function NewEvidence() {
     };
     console.log(updatedData);
     try {
-      const res = await AxiosInstance.post('/evidence/create', updatedData);
+      await AxiosInstance.post('/evidence/create', updatedData);
       router.push('/');
     } catch (error) {
       console.log(error);

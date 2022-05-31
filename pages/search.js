@@ -20,7 +20,6 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useToast,
-  Skeleton,
   VStack,
   Input,
   InputGroup,
@@ -42,7 +41,12 @@ import dayjs from 'dayjs';
 import Head from 'next/head';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import AxiosInstance from '../lib/api';
-import { status as statuses } from '../lib/helper/static';
+import {
+  policeStation as policeStations,
+  provinces,
+  status as statuses,
+} from '../lib/helper/static';
+import { renderPoliceStation } from '../lib/helper';
 
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
@@ -67,6 +71,7 @@ function AdvancedSearch() {
   const [stationType, setStationType] = useState('0');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [policeStation, setPoliceStation] = useState(null);
 
   const router = useRouter();
 
@@ -82,6 +87,7 @@ function AdvancedSearch() {
           status: status !== 'all' ? status : null,
           receivedStartDate: startDate,
           receivedEndDate: endDate,
+          policeStation: policeStation || null,
         },
       });
       setEvidences(res.data.data);
@@ -89,7 +95,6 @@ function AdvancedSearch() {
     } catch (error) {
       setEvidences([]);
       setIsLoading(false);
-      console.log(error);
     }
   };
 
@@ -106,7 +111,7 @@ function AdvancedSearch() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await AxiosInstance.get('/checkAuth');
+        await AxiosInstance.get('/checkAuth');
       } catch (error) {
         router.push('/login');
       }
@@ -132,7 +137,56 @@ function AdvancedSearch() {
       case 'deleted':
         return 'ถูกลบ';
       default:
-        break;
+        return '';
+    }
+  };
+  const renderStationOptions = () => {
+    if (stationType === '1') {
+      return (
+        <Select
+          value={policeStation}
+          onChange={(e) => setPoliceStation(e.target.value)}
+          placeholder='กรุณาเลือกสน'
+        >
+          {policeStations.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </Select>
+      );
+    }
+    if (stationType === '2') {
+      return (
+        <Select
+          value={policeStation}
+          onChange={(e) => setPoliceStation(e.target.value)}
+          placeholder='กรุณาเลือกจังหวัด'
+        >
+          {provinces
+            .sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'))
+            .map(({ name_th, name_en }) => (
+              <option key={name_en} value={name_en}>
+                {name_th}
+              </option>
+            ))}
+        </Select>
+      );
+    }
+    if (stationType === '3') {
+      return (
+        <Select
+          value={policeStation}
+          onChange={(e) => setPoliceStation(e.target.value)}
+          placeholder='กรุณาเลือกหน่วยงาน'
+        >
+          <option value='drug-1'>กองบัญชาการตำรวจปราบปรามยาเสพติด 1</option>
+          <option value='drug-2'>กองบัญชาการตำรวจปราบปรามยาเสพติด 2</option>
+          <option value='drug-3'>กองบัญชาการตำรวจปราบปรามยาเสพติด 3</option>
+          <option value='drug-4'>กองบัญชาการตำรวจปราบปรามยาเสพติด 4</option>
+          <option value='etc'>อื่นๆ</option>
+        </Select>
+      );
     }
   };
 
@@ -149,7 +203,14 @@ function AdvancedSearch() {
           </Link>
         </Flex> */}
         <VStack alignItems='start'>
-          <RadioGroup onChange={setStationType} value={stationType}>
+          <Text>กรุณาเลือกประเภท</Text>
+          <RadioGroup
+            onChange={(value) => {
+              setPoliceStation(null);
+              setStationType(value);
+            }}
+            value={stationType}
+          >
             <Stack direction='row'>
               <Radio value='0'>ทั้งหมด</Radio>
               <Radio value='1'>สภ.</Radio>
@@ -157,6 +218,8 @@ function AdvancedSearch() {
               <Radio value='3'>อื่นๆ</Radio>
             </Stack>
           </RadioGroup>
+          {renderStationOptions()}
+          <Text>สถานะ</Text>
           <Select
             errorBorderColor='crimson'
             defaultValue='pending'
@@ -169,25 +232,26 @@ function AdvancedSearch() {
               <option value={value}>{label}</option>
             ))}
           </Select>
+          <Text>วันที่รับของ เริ่มต้น - สิ้นสุด</Text>
           <HStack w='100%'>
             <DatePicker
               locale='th-TH'
               value={startDate}
               onChange={(date) => setStartDate(date)}
             />
+            <Text>-</Text>
             <DatePicker
               locale='th-TH'
               value={endDate}
               onChange={(date) => setEndDate(date)}
             />
           </HStack>
-
+          <Text>ค้นหาด้วยรหัส</Text>
           <HStack justify='space-between' mb='4' w='100%'>
             <InputGroup>
-              <InputLeftElement
-                pointerEvents='none'
-                children={<SearchIcon zIndex={0} />}
-              />
+              <InputLeftElement pointerEvents='none'>
+                <SearchIcon zIndex={0} />
+              </InputLeftElement>
               <Input
                 onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}
                 placeholder='กรอกรหัสเพื่อค้นหา'
@@ -200,7 +264,6 @@ function AdvancedSearch() {
             </Button>
           </HStack>
         </VStack>
-
         {isLoading && (
           <Center mt='4'>
             <Spinner />
@@ -262,7 +325,7 @@ function AdvancedSearch() {
                       <Td>{renderStatus(status)}</Td>
                       <Td>{evidenceId}</Td>
                       <Td>{dayjs(receivedDate).format('DD/MM/YY')}</Td>
-                      <Td>{policeStation}</Td>
+                      <Td>{renderPoliceStation(policeStation)}</Td>
                       <Td>{packageId}</Td>
                       <Td>{dayjs(packageDate).format('DD/MM/YY')}</Td>
                       <Td>{detectiveName}</Td>
