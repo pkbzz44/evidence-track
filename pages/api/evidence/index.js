@@ -2,7 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 export default function handler(req, res) {
-  const { evidenceId, stationType, status } = req?.query;
+  const {
+    evidenceId,
+    stationType,
+    status,
+    receivedStartDate,
+    receivedEndDate,
+  } = req?.query || {};
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
   try {
@@ -12,6 +18,18 @@ export default function handler(req, res) {
   }
 
   const prisma = new PrismaClient();
+
+  const receivedDateQuery = () => {
+    if (!receivedStartDate && !receivedEndDate) return undefined;
+    if (receivedStartDate && !receivedEndDate)
+      return {
+        gte: receivedStartDate,
+      };
+    return {
+      gte: receivedStartDate,
+      lt: receivedEndDate,
+    };
+  };
 
   async function main() {
     await prisma.$connect();
@@ -23,6 +41,7 @@ export default function handler(req, res) {
           status: status || {
             not: 'deleted',
           },
+          receivedDate: receivedDateQuery(),
         },
         include: {
           owner: true,

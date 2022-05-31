@@ -80,12 +80,15 @@ function AdvancedSearch() {
           evidenceId: evidenceSearchId !== '' ? evidenceSearchId : null,
           stationType: st > 0 ? st : null,
           status: status !== 'all' ? status : null,
+          receivedStartDate: startDate,
+          receivedEndDate: endDate,
         },
       });
       setEvidences(res.data.data);
       setIsLoading(false);
     } catch (error) {
       setEvidences([]);
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -276,7 +279,7 @@ function AdvancedSearch() {
             </Table>
           </TableContainer>
         )}
-        {evidences.length === 0 && hasSearched && (
+        {evidences.length === 0 && hasSearched && !isLoading && (
           <Alert status='error' w='100%'>
             <AlertIcon />
             <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
