@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
 
 export default function handler(req, res) {
   const {
@@ -21,14 +22,26 @@ export default function handler(req, res) {
   const prisma = new PrismaClient();
 
   const receivedDateQuery = () => {
-    if (!receivedStartDate && !receivedEndDate) return undefined;
-    if (receivedStartDate && !receivedEndDate)
+    // no input
+    if (!receivedStartDate && !receivedEndDate) {
+      return undefined;
+    }
+    // only startdate
+    if (receivedStartDate && !receivedEndDate) {
       return {
         gte: receivedStartDate,
       };
+    }
+    // only enddate
+    if (!receivedStartDate && receivedEndDate) {
+      return {
+        lt: dayjs(receivedEndDate).add(1, 'day').toISOString(),
+      };
+    }
+    // both
     return {
       gte: receivedStartDate,
-      lt: receivedEndDate,
+      lt: dayjs(receivedEndDate).add(1, 'day').toISOString(),
     };
   };
 
