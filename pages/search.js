@@ -146,7 +146,7 @@ function AdvancedSearch() {
         <Select
           value={policeStation}
           onChange={(e) => setPoliceStation(e.target.value)}
-          placeholder='กรุณาเลือกสน'
+          placeholder='สน. ทั้งหมด'
         >
           {policeStations.map((name) => (
             <option key={name} value={name}>
@@ -161,7 +161,7 @@ function AdvancedSearch() {
         <Select
           value={policeStation}
           onChange={(e) => setPoliceStation(e.target.value)}
-          placeholder='กรุณาเลือกจังหวัด'
+          placeholder='จังหวัดทั้งหมด'
         >
           {provinces
             .sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'))
@@ -178,7 +178,7 @@ function AdvancedSearch() {
         <Select
           value={policeStation}
           onChange={(e) => setPoliceStation(e.target.value)}
-          placeholder='กรุณาเลือกหน่วยงาน'
+          placeholder='หน่วยงานทั้งหมด'
         >
           <option value='drug-1'>กองบัญชาการตำรวจปราบปรามยาเสพติด 1</option>
           <option value='drug-2'>กองบัญชาการตำรวจปราบปรามยาเสพติด 2</option>
@@ -278,7 +278,7 @@ function AdvancedSearch() {
                   <Th color='white'>สถานะ</Th>
                   <Th color='white'>เลข ก</Th>
                   <Th color='white'>วันที่รับของ</Th>
-                  <Th color='white'>สน / สภ</Th>
+                  <Th color='white'>สน. / สภ.</Th>
                   <Th color='white'>เลขหนังสือนำส่ง</Th>
                   <Th color='white'>ลงวันที่</Th>
                   <Th color='white'>พนักงานสอบสวน</Th>

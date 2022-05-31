@@ -167,7 +167,7 @@ function Home() {
                 <Th color='white'>สถานะ</Th>
                 <Th color='white'>เลข ก</Th>
                 <Th color='white'>วันที่รับของ</Th>
-                <Th color='white'>สน / สภ</Th>
+                <Th color='white'>สน. / สภ.</Th>
                 <Th color='white'>เลขหนังสือนำส่ง</Th>
                 <Th color='white'>ลงวันที่</Th>
                 <Th color='white'>พนักงานสอบสวน</Th>

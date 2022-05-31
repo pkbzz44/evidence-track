@@ -19,8 +19,8 @@ import {
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import AxiosInstance from '../../lib/api';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
+import AxiosInstance from '../../lib/api';
 import { policeStation, provinces } from '../../lib/helper/static';
 
 if (typeof window !== 'undefined') {
@@ -28,7 +28,7 @@ if (typeof window !== 'undefined') {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
   };
 }
-const EditEvidence = () => {
+function EditEvidence() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const toast = useToast();
@@ -115,23 +115,22 @@ const EditEvidence = () => {
     if (stationType === '1') {
       return (
         <Select
-          placeholder='กรุณาเลือกสน'
+          placeholder='กรุณาเลือกสน.'
           {...register('policeStation')}
           onChange={(e) => {
             const division = e.target.value.split(' - ')[1];
             setDivision(division);
           }}
         >
-          {policeStation.map((name) => {
-            return (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            );
-          })}
+          {policeStation.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
         </Select>
       );
-    } else if (stationType === '2') {
+    }
+    if (stationType === '2') {
       return (
         <>
           <Select
@@ -143,13 +142,11 @@ const EditEvidence = () => {
           >
             {provinces
               .sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'))
-              .map(({ name_th, name_en }) => {
-                return (
-                  <option key={name_en} value={name_en}>
-                    {name_th}
-                  </option>
-                );
-              })}
+              .map(({ name_th, name_en }) => (
+                <option key={name_en} value={name_en}>
+                  {name_th}
+                </option>
+              ))}
           </Select>
           <Text>ชื่อ สภ.</Text>
           <Input
@@ -160,7 +157,8 @@ const EditEvidence = () => {
           />
         </>
       );
-    } else if (stationType === '3') {
+    }
+    if (stationType === '3') {
       return (
         <>
           <Select
@@ -206,7 +204,7 @@ const EditEvidence = () => {
           <Select
             isInvalid={errors.status}
             errorBorderColor='crimson'
-            defaultValue={'pending'}
+            defaultValue='pending'
             // placeholder='กรุณาเลือกสถานะ'
             {...register('status', { required: true })}
           >
@@ -324,6 +322,6 @@ const EditEvidence = () => {
       </form>
     </Container>
   );
-};
+}
 
 export default EditEvidence;

@@ -83,7 +83,7 @@ function NewEvidence() {
     if (stationType === '1') {
       return (
         <Select
-          placeholder='กรุณาเลือกสน'
+          placeholder='กรุณาเลือกสน.'
           {...register('policeStation')}
           onChange={(e) => {
             const division = e.target.value.split(' - ')[1];
