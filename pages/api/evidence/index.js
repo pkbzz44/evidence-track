@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 export default function handler(req, res) {
-  const { evidenceId } = req?.query;
+  const { evidenceId, stationType, status } = req?.query;
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
   try {
@@ -19,7 +19,8 @@ export default function handler(req, res) {
       const users = await prisma.evidence.findMany({
         where: {
           evidenceId: evidenceId || undefined,
-          status: {
+          stationType: Number(stationType) || undefined,
+          status: status || {
             not: 'deleted',
           },
         },
@@ -33,7 +34,7 @@ export default function handler(req, res) {
         data: users,
       });
     } catch (error) {
-      return res.status(500).json('invalid id');
+      return res.status(500).json(error);
     }
   }
 

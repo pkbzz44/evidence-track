@@ -20,7 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import AxiosInstance from '../lib/api';
-import { policeStation, provinces } from '../lib/helper/static';
+import { policeStation, provinces, status } from '../lib/helper/static';
 
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
@@ -174,12 +174,9 @@ function NewEvidence() {
             // placeholder='กรุณาเลือกสถานะ'
             {...register('status', { required: true })}
           >
-            <option value='pending'>ยังไม่ได้คืน</option>
-            <option value='labAll'>ส่งต่องาน แฝง (ทั้งหมด)</option>
-            <option value='labPartial'>ส่งต่องาน แฝง (บางส่วน)</option>
-            <option value='returnedAll'>คืน พงส. แล้ว (ทั้งหมด)</option>
-            <option value='returnedPartial'>คืน พงส. แล้ว (บางส่วน)</option>
-            <option value='other'>ส่งต่อกลุ่มงานอื่นๆ ระบุ</option>
+            {status.map(({ value, label }) => (
+              <option value={value}>{label}</option>
+            ))}
           </Select>
           {watch('status') === 'other' && (
             <Input

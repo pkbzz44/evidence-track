@@ -8,7 +8,6 @@ import {
   Td,
   TableContainer,
   Heading,
-  Box,
   Button,
   Text,
   HStack,
@@ -16,6 +15,7 @@ import {
   AlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
+  Select,
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
@@ -32,6 +32,8 @@ import {
   AlertDescription,
   Radio,
   RadioGroup,
+  Spinner,
+  Center,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
@@ -40,6 +42,7 @@ import dayjs from 'dayjs';
 import Head from 'next/head';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import AxiosInstance from '../lib/api';
+import { status as statuses } from '../lib/helper/static';
 
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
@@ -49,6 +52,7 @@ if (typeof window !== 'undefined') {
 
 function AdvancedSearch() {
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState('all');
   const toast = useToast();
   const cancelRef = useRef();
   const {
@@ -60,7 +64,7 @@ function AdvancedSearch() {
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [evidenceSearchId, setEvidenceSearchId] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-  const [evidenceType, setEvidenceType] = useState('0');
+  const [stationType, setStationType] = useState('0');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -68,10 +72,14 @@ function AdvancedSearch() {
 
   // Methods
   const fetchEvidences = async () => {
+    setIsLoading(true);
+    const st = Number(stationType);
     try {
       const res = await AxiosInstance.get('/evidence', {
         params: {
           evidenceId: evidenceSearchId !== '' ? evidenceSearchId : null,
+          stationType: st > 0 ? st : null,
+          status: status !== 'all' ? status : null,
         },
       });
       setEvidences(res.data.data);
@@ -84,6 +92,7 @@ function AdvancedSearch() {
 
   const handleOnClickSearch = () => {
     fetchEvidences();
+    setHasSearched(true);
   };
 
   const handleDelete = (evidence) => {
@@ -124,14 +133,6 @@ function AdvancedSearch() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <VStack>
-        <Skeleton height='20px' /> <Skeleton height='20px' /> <Skeleton />
-      </VStack>
-    );
-  }
-
   return (
     <>
       <Head>
@@ -145,17 +146,26 @@ function AdvancedSearch() {
           </Link>
         </Flex> */}
         <VStack alignItems='start'>
-          <RadioGroup onChange={setEvidenceType} value={evidenceType}>
+          <RadioGroup onChange={setStationType} value={stationType}>
             <Stack direction='row'>
               <Radio value='0'>ทั้งหมด</Radio>
-
               <Radio value='1'>สภ.</Radio>
-
               <Radio value='2'>สน.</Radio>
               <Radio value='3'>อื่นๆ</Radio>
             </Stack>
           </RadioGroup>
-
+          <Select
+            errorBorderColor='crimson'
+            defaultValue='pending'
+            // placeholder='กรุณาเลือกสถานะ'
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value='all'>ทั้งหมด</option>
+            {statuses.map(({ value, label }) => (
+              <option value={value}>{label}</option>
+            ))}
+          </Select>
           <HStack w='100%'>
             <DatePicker
               locale='th-TH'
@@ -188,8 +198,13 @@ function AdvancedSearch() {
           </HStack>
         </VStack>
 
-        {hasSearched && (
-          <TableContainer>
+        {isLoading && (
+          <Center mt='4'>
+            <Spinner />
+          </Center>
+        )}
+        {hasSearched && !isLoading && (
+          <TableContainer mt='4'>
             <Table variant='striped' colorScheme='twitter'>
               <Thead bgColor='orange.500'>
                 <Tr>
