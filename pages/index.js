@@ -136,6 +136,21 @@ function Home() {
     );
   }
 
+  const renderPoliceStation = (s) => {
+    switch (s) {
+      case 'drug-1':
+        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 1';
+      case 'drug-2':
+        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 2';
+      case 'drug-3':
+        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 3';
+      case 'drug-4':
+        return 'กองบัญชาการตำรวจปราบปรามยาเสพติด 4';
+      default:
+        return s;
+    }
+  };
+
   return (
     <>
       <Head>
@@ -196,7 +211,7 @@ function Home() {
                   itemsDescription,
                   storedAt,
                   LTName,
-                  technique,
+                  techniques,
                   status,
                   owner,
                 } = evidence;
@@ -217,14 +232,14 @@ function Home() {
                     <Td>{renderStatus(status)}</Td>
                     <Td>{evidenceId}</Td>
                     <Td>{dayjs(receivedDate).format('DD/MM/YY')}</Td>
-                    <Td>{policeStation}</Td>
+                    <Td>{renderPoliceStation(policeStation)}</Td>
                     <Td>{packageId}</Td>
                     <Td>{dayjs(packageDate).format('DD/MM/YY')}</Td>
                     <Td>{detectiveName}</Td>
                     <Td>{detectivePhone}</Td>
                     <Td>{itemsDescription}</Td>
                     <Td>{storedAt}</Td>
-                    <Td>{technique}</Td>
+                    <Td>{techniques?.map((t) => `${t} `)}</Td>
                     <Td>{LTName}</Td>
                     <Td>{owner.name}</Td>
                   </Tr>

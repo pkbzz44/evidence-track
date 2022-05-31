@@ -38,6 +38,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 import dayjs from 'dayjs';
 import Head from 'next/head';
+import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import AxiosInstance from '../lib/api';
 
 if (typeof window !== 'undefined') {
@@ -59,7 +60,10 @@ function AdvancedSearch() {
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [evidenceSearchId, setEvidenceSearchId] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-  const [evidenceType, setEvidenceType] = useState(null);
+  const [evidenceType, setEvidenceType] = useState('0');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   const router = useRouter();
 
   // Methods
@@ -143,16 +147,33 @@ function AdvancedSearch() {
         <VStack alignItems='start'>
           <RadioGroup onChange={setEvidenceType} value={evidenceType}>
             <Stack direction='row'>
+              <Radio value='0'>ทั้งหมด</Radio>
+
               <Radio value='1'>สภ.</Radio>
+
               <Radio value='2'>สน.</Radio>
               <Radio value='3'>อื่นๆ</Radio>
             </Stack>
           </RadioGroup>
+
+          <HStack w='100%'>
+            <DatePicker
+              locale='th-TH'
+              value={startDate}
+              onChange={(date) => setStartDate(date)}
+            />
+            <DatePicker
+              locale='th-TH'
+              value={endDate}
+              onChange={(date) => setEndDate(date)}
+            />
+          </HStack>
+
           <HStack justify='space-between' mb='4' w='100%'>
             <InputGroup>
               <InputLeftElement
                 pointerEvents='none'
-                children={<SearchIcon />}
+                children={<SearchIcon zIndex={0} />}
               />
               <Input
                 onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}

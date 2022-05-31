@@ -10,3 +10,7 @@
   align-items: center;
   padding-left: 12px !important;
 }
+
+.react-date-picker.react-date-picker--open.react-date-picker--enabled {
+  z-index: 3;
+}
