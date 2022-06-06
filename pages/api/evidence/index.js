@@ -50,17 +50,23 @@ export default function handler(req, res) {
 
   async function main() {
     await prisma.$connect();
+
     try {
-      const users = await prisma.evidence.findMany({
-        where: {
-          evidenceId: evidenceId || undefined,
-          stationType: Number(stationType) || undefined,
-          status: status || {
-            not: 'deleted',
-          },
-          receivedDate: receivedDateQuery(),
-          policeStation: policeStation || undefined,
+      const where = {
+        evidenceId: evidenceId || undefined,
+        stationType: Number(stationType) || undefined,
+        status: status || {
+          not: 'deleted',
         },
+        receivedDate: receivedDateQuery(),
+        policeStation: policeStation || undefined,
+      };
+
+      const total = await prisma.evidence.count({ where });
+      const totalPages = Math.ceil(total / RESULTS_PER_PAGE);
+
+      const users = await prisma.evidence.findMany({
+        where,
         include: {
           owner: true,
         },
@@ -70,6 +76,8 @@ export default function handler(req, res) {
       if (users.length === 0) return res.status(404).json('not found');
       return res.status(200).json({
         count: users.length,
+        total,
+        totalPages,
         data: users,
       });
     } catch (error) {

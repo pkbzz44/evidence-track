@@ -34,6 +34,15 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 import dayjs from 'dayjs';
 import Head from 'next/head';
+import {
+  Pagination,
+  usePagination,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+  PaginationContainer,
+  PaginationPageGroup,
+} from '@ajna/pagination';
 import { renderPoliceStation } from '../lib/helper';
 import AxiosInstance from '../lib/api';
 
