@@ -175,7 +175,9 @@ function NewEvidence() {
             {...register('status', { required: true })}
           >
             {status.map(({ value, label }) => (
-              <option value={value}>{label}</option>
+              <option key={label} value={value}>
+                {label}
+              </option>
             ))}
           </Select>
           {watch('status') === 'other' && (
