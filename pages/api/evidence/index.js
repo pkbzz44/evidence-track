@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 
 export default function handler(req, res) {
+  const RESULTS_PER_PAGE = 4;
+
   const {
     evidenceId,
     stationType,
@@ -10,6 +12,7 @@ export default function handler(req, res) {
     receivedStartDate,
     receivedEndDate,
     policeStation,
+    page = 0,
   } = req?.query || {};
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
@@ -61,6 +64,8 @@ export default function handler(req, res) {
         include: {
           owner: true,
         },
+        take: 4,
+        skip: RESULTS_PER_PAGE * page,
       });
       if (users.length === 0) return res.status(404).json('not found');
       return res.status(200).json({
