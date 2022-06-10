@@ -28,10 +28,12 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Stack,
 } from '@chakra-ui/react';
+import { useQuery, useQueryClient } from 'react-query';
 import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
 import Head from 'next/head';
 import {
@@ -53,7 +55,6 @@ if (typeof window !== 'undefined') {
 }
 
 function Home() {
-  const [isLoading, setIsLoading] = useState(true);
   const toast = useToast();
   const cancelRef = useRef();
   const {
@@ -61,39 +62,55 @@ function Home() {
     onOpen: onOpenDeleteDialog,
     onClose: onCloseDeleteDialog,
   } = useDisclosure();
-  const [evidences, setEvidences] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [evidenceSearchId, setEvidenceSearchId] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagesCount, setPagesCount] = useState(1);
   const router = useRouter();
+  const qClient = useQueryClient();
 
   // Methods
-  const fetchEvidences = async () => {
+
+  const fetchAuth = async () => {
+    try {
+      const res = await AxiosInstance.get('/checkAuth');
+      return res.data;
+    } catch (error) {
+      return router.push('/login');
+    }
+  };
+
+  const fetchEvidences = async (page = 0) => {
     try {
       const res = await AxiosInstance.get('/evidence', {
         params: {
           evidenceId: evidenceSearchId !== '' ? evidenceSearchId : null,
+          page,
         },
       });
-      setEvidences(res.data.data);
-      setIsLoading(false);
+      return res.data;
     } catch (error) {
-      setEvidences([]);
-      console.log(error);
+      return [];
     }
   };
 
-  // const fetchEvidences = async () => {
-  //   try {
-  //     const res = await AxiosInstance.get('/evidence');
-  //     setEvidences(res.data.data);
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const { data: evidences, isLoading } = useQuery('evidences data', () => {
+    console.log(currentPage);
+    return fetchEvidences(currentPage - 1);
+  });
+
+  useEffect(() => {
+    setPagesCount(evidences?.totalPages);
+  }, [evidences]);
+
+  useEffect(() => {
+    qClient.invalidateQueries('evidences data');
+  }, [currentPage]);
+
+  const { data: auth } = useQuery('auth data', fetchAuth);
 
   const handleOnClickSearch = () => {
-    fetchEvidences();
+    fetchEvidences(0);
   };
 
   const handleDelete = (evidence) => {
@@ -101,17 +118,9 @@ function Home() {
     onOpenDeleteDialog();
   };
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res = await AxiosInstance.get('/checkAuth');
-      } catch (error) {
-        router.push('/login');
-      }
-    };
-    fetch();
-    fetchEvidences();
-  }, []);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const renderStatus = (status) => {
     switch (status) {
@@ -189,7 +198,7 @@ function Home() {
               </Tr>
             </Thead>
             <Tbody>
-              {evidences.map((evidence) => {
+              {evidences?.data?.map((evidence) => {
                 const {
                   id,
                   evidenceId,
@@ -239,6 +248,31 @@ function Home() {
             </Tbody>
           </Table>
         </TableContainer>
+        <Stack>
+          <Pagination
+            pagesCount={pagesCount}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          >
+            <PaginationContainer mt='2' align='center' justify='end'>
+              <PaginationPrevious colorScheme='blue' mr='1'>
+                Previous
+              </PaginationPrevious>
+              <PaginationPageGroup>
+                {[...Array(pagesCount)].map((_, page) => (
+                  <PaginationPage
+                    colorScheme='blue'
+                    key={`pagination_page_${page}`}
+                    page={page + 1}
+                  />
+                ))}
+              </PaginationPageGroup>
+              <PaginationNext colorScheme='blue' ml='1'>
+                Next
+              </PaginationNext>
+            </PaginationContainer>
+          </Pagination>
+        </Stack>
         {evidences.length === 0 && (
           <Alert status='error' w='100%'>
             <AlertIcon />
