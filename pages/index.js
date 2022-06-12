@@ -265,7 +265,8 @@ function Home() {
                     colorScheme='blue'
                     key={`pagination_page_${page}`}
                     page={page + 1}
-                    width='30px '
+                    width='30px'
+                    disabled={page === currentPage - 1}
                   />
                 ))}
               </PaginationPageGroup>

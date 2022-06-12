@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 
 export default function handler(req, res) {
-  const RESULTS_PER_PAGE = 4;
+  const RESULTS_PER_PAGE = 1;
 
   const {
     evidenceId,
@@ -70,7 +70,7 @@ export default function handler(req, res) {
         include: {
           owner: true,
         },
-        take: 4,
+        take: RESULTS_PER_PAGE,
         skip: RESULTS_PER_PAGE * page,
       });
       if (users.length === 0) return res.status(404).json('not found');
