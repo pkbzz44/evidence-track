@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import {
   Container,
   Table,
@@ -94,10 +95,10 @@ function Home() {
     }
   };
 
-  const { data: evidences, isLoading } = useQuery('evidences data', () => {
-    console.log(currentPage);
-    return fetchEvidences(currentPage - 1);
-  });
+  const { data: evidences, isLoading } = useQuery(
+    ['evidences data', currentPage],
+    () => fetchEvidences(currentPage - 1)
+  );
 
   useEffect(() => {
     setPagesCount(evidences?.totalPages);
@@ -264,6 +265,7 @@ function Home() {
                     colorScheme='blue'
                     key={`pagination_page_${page}`}
                     page={page + 1}
+                    width='30px '
                   />
                 ))}
               </PaginationPageGroup>
