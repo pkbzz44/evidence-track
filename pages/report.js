@@ -145,7 +145,7 @@ ${data?.returns
               คัดลอก
             </Button>
           </CopyToClipboard>
-          <Box
+          {/* <Box
             position='relative'
             top='8px'
             as='a'
@@ -155,7 +155,7 @@ ${data?.returns
             ).toString()}`}
           >
             <LineIcon size={48} round />
-          </Box>
+          </Box> */}
         </HStack>
       </Container>
     </>
