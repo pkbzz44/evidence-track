@@ -145,10 +145,16 @@ ${data?.returns
               คัดลอก
             </Button>
           </CopyToClipboard>
-          <Box position='relative' top='8px'>
-            <LineShareButton url={`https://line.me/R/share?text=${text}`}>
-              <LineIcon size={48} round />
-            </LineShareButton>
+          <Box
+            position='relative'
+            top='8px'
+            as='a'
+            href={`https://line.me/R/share?text=${Buffer.from(
+              text,
+              'utf-8'
+            ).toString()}`}
+          >
+            <LineIcon size={48} round />
           </Box>
         </HStack>
       </Container>
