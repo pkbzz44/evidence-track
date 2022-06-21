@@ -78,7 +78,7 @@ export default function Navbar() {
           >
             <Button
               as='a'
-              display={{ base: 'none', md: 'inline-flex' }}
+              display={{ base: 'inline-flex', md: 'inline-flex' }}
               fontSize='sm'
               fontWeight={600}
               onClick={() => {
