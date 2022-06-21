@@ -52,7 +52,10 @@ export default function handler(req, res) {
           where: {
             id,
           },
-          data: req.body,
+          data: {
+            ...req.body,
+            updatedAt: new Date(),
+          },
         });
         return res.status(200).json(user);
       } catch (err) {

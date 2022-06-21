@@ -72,6 +72,9 @@ export default function handler(req, res) {
         },
         take: RESULTS_PER_PAGE,
         skip: RESULTS_PER_PAGE * page,
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
       if (users.length === 0) return res.status(404).json('not found');
       return res.status(200).json({

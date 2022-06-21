@@ -37,9 +37,11 @@ model Evidence {
   status           Status    @default(pending)
   stationType      Int
   important        Important @default(normal)
-  //จังหวัด ของ สภ
   province         String?
   stationTypeOther String?
+  hasReturnedSameDay Boolean @default(false)
+  createdAt DateTime
+  updatedAt DateTime
 }
 
 enum Status {

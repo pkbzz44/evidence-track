@@ -9,16 +9,21 @@ export default function handler(req, res) {
   const { id } = decoded;
   const prisma = new PrismaClient();
   const { body } = req;
+  const now = new Date();
 
   async function main() {
     if (!verify) {
       return res.status(401).json('unauthorized');
     }
     await prisma.$connect();
-    const newEvidence = await prisma.evidence.create({
-      data: { ...body, ownerId: id },
-    });
-    res.status(200).json(newEvidence);
+    try {
+      const newEvidence = await prisma.evidence.create({
+        data: { ...body, ownerId: id, createdAt: now, updatedAt: now },
+      });
+      return res.status(200).json(newEvidence);
+    } catch (error) {
+      return res.status(500).json(error);
+    }
   }
 
   main()

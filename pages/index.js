@@ -146,8 +146,9 @@ function Home() {
 
   if (isLoading) {
     return (
-      <VStack>
-        <Skeleton height='20px' /> <Skeleton height='20px' /> <Skeleton />
+      <VStack mt='16'>
+        <Skeleton width='80%' height='20px' />{' '}
+        <Skeleton width='80%' height='20px' /> <Skeleton />
       </VStack>
     );
   }

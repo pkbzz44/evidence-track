@@ -269,4 +269,8 @@ const NAV_ITEMS = [
     label: 'ค้นหาขั้นสูง',
     href: '/search',
   },
+  {
+    label: 'สร้างรายงาน',
+    href: '/report',
+  },
 ];
