@@ -85,16 +85,22 @@ function Home() {
   const text = `สถิติของกลาง
 วันที่ ${dayjs().format('DD MMM BBBB')}
 ร้อยเวรแลป : ${auth?.fullName}
-ของกลาง จำนวน ${count?.pendings} รายการ
-${data?.pendings?.map(({ evidenceId, policeStation, stationId }) => {
-  const type = stationId === 1 ? 'สน.' : 'สภ.';
-  return `${evidenceId} ${type} ${policeStation.split(' - ')[0]}`;
-})}
+- ของกลาง จำนวน ${count?.pendings} รายการ
+${data?.pendings
+  ?.map(({ evidenceId, policeStation, stationId }) => {
+    const type = stationId === 1 ? 'สน.' : 'สภ.';
+    return `${evidenceId} ${type} ${policeStation.split(' - ')[0]}`;
+  })
+  .join('\n')}
 - คืนของกลาง จำนวน ${count?.returns} รายการ
-${data?.returns?.map(({ evidenceId, policeStation, stationId }) => {
-  const type = stationId === 1 ? 'สน.' : 'สภ.';
-  return `${evidenceId} ${type} ${policeStation.split(' - ')[0]}`;
-})}`;
+${data?.returns
+  ?.map(({ evidenceId, policeStation, stationId }) => {
+    const type = stationId === 1 ? 'สน.' : 'สภ.';
+    return `${evidenceId} ${type} ${policeStation.split(' - ')[0]}`;
+  })
+  .join('\n')}`;
+
+  console.log(data?.pendings);
 
   return (
     <>
