@@ -8,6 +8,8 @@ import {
   Skeleton,
   VStack,
   Button,
+  HStack,
+  Box,
 } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
@@ -17,6 +19,7 @@ import Head from 'next/head';
 
 import buddhistEra from 'dayjs/plugin/buddhistEra';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { LineShareButton, LineIcon } from 'react-share';
 import AxiosInstance from '../lib/api';
 
 dayjs.extend(buddhistEra);
@@ -133,14 +136,21 @@ ${data?.returns
             </Text>
           );
         })}
-        <CopyToClipboard
-          text={text}
-          onCopy={() => toast({ title: 'คัดลอกสำเร็จ!', status: 'success' })}
-        >
-          <Button mt='4' colorScheme='blue'>
-            คัดลอก
-          </Button>
-        </CopyToClipboard>
+        <HStack align='center'>
+          <CopyToClipboard
+            text={text}
+            onCopy={() => toast({ title: 'คัดลอกสำเร็จ!', status: 'success' })}
+          >
+            <Button mt='4' colorScheme='blue'>
+              คัดลอก
+            </Button>
+          </CopyToClipboard>
+          <Box position='relative' top='8px'>
+            <LineShareButton url={`https://line.me/R/share?text=${text}`}>
+              <LineIcon size={48} round />
+            </LineShareButton>
+          </Box>
+        </HStack>
       </Container>
     </>
   );
