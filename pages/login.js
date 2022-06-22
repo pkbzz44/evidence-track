@@ -9,7 +9,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import AxiosInstance from '../lib/api';
@@ -23,7 +23,7 @@ function Login() {
   const router = useRouter();
 
   const toast = useToast();
-  const { data, error } = useQuery('fetch auth', () =>
+  const { data } = useQuery('fetch auth', () =>
     AxiosInstance.get('/checkAuth')
   );
 
