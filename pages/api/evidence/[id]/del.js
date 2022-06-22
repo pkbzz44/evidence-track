@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import prisma from '../../../../lib/prisma';
 
 export default function handler(req, res) {
   if (req.method !== 'DELETE') return res.status(404).json('not found');
@@ -11,7 +11,6 @@ export default function handler(req, res) {
     return res.status(401).json('unauthorized');
   }
   const { id } = req.query;
-  const prisma = new PrismaClient();
 
   async function main() {
     await prisma.$connect();
@@ -37,4 +36,5 @@ export default function handler(req, res) {
     .finally(async () => {
       await prisma.$disconnect();
     });
+  return null;
 }

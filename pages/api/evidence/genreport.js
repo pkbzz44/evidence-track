@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
+import prisma from '../../../lib/prisma';
 
 export default function handler(req, res) {
-  const RESULTS_PER_PAGE = 10;
-
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader?.split('Bearer ')[1];
   try {
@@ -12,8 +10,6 @@ export default function handler(req, res) {
   } catch (error) {
     return res.status(401).json('unauthorized');
   }
-
-  const prisma = new PrismaClient();
 
   const startDay = dayjs();
   const start = startDay.startOf('day').toISOString();
@@ -76,7 +72,6 @@ export default function handler(req, res) {
         },
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json(error);
     }
   }
@@ -88,4 +83,11 @@ export default function handler(req, res) {
     .finally(async () => {
       await prisma.$disconnect();
     });
+  return null;
 }
+
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};

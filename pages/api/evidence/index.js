@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
+import prisma from '../../../lib/prisma';
 
 export default function handler(req, res) {
   const RESULTS_PER_PAGE = 10;
@@ -21,8 +21,6 @@ export default function handler(req, res) {
   } catch (error) {
     return res.status(401).json('unauthorized');
   }
-
-  const prisma = new PrismaClient();
 
   const receivedDateQuery = () => {
     // no input
@@ -53,7 +51,9 @@ export default function handler(req, res) {
 
     try {
       const where = {
-        evidenceId: evidenceId || undefined,
+        evidenceId: {
+          contains: evidenceId,
+        },
         stationType: Number(stationType) || undefined,
         status: status || {
           not: 'deleted',
@@ -65,7 +65,7 @@ export default function handler(req, res) {
       const total = await prisma.evidence.count({ where });
       const totalPages = Math.ceil(total / RESULTS_PER_PAGE);
 
-      const users = await prisma.evidence.findMany({
+      const evidences = await prisma.evidence.findMany({
         where,
         include: {
           owner: true,
@@ -76,12 +76,18 @@ export default function handler(req, res) {
           createdAt: 'desc',
         },
       });
-      if (users.length === 0) return res.status(404).json('not found');
+      if (evidences.length === 0)
+        return res.json({
+          count: 0,
+          total: 0,
+          totalPages: 0,
+          data: [],
+        });
       return res.status(200).json({
-        count: users.length,
+        count: evidences.length,
         total,
         totalPages,
-        data: users,
+        data: evidences,
       });
     } catch (error) {
       return res.status(500).json(error);
@@ -95,4 +101,11 @@ export default function handler(req, res) {
     .finally(async () => {
       await prisma.$disconnect();
     });
+  return null;
 }
+
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};

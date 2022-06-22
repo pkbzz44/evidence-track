@@ -1,7 +1,42 @@
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import prisma from '../../../../lib/prisma';
 
 export default function handler(req, res) {
+  const { id } = req.query;
+
+  async function mainGet() {
+    await prisma.$connect();
+    try {
+      const user = await prisma.evidence.findUnique({
+        where: {
+          id,
+        },
+      });
+      return res.status(200).json(user);
+    } catch (err) {
+      return res.status(404).json('id not found');
+    }
+  }
+
+  async function mainPatch() {
+    await prisma.$connect();
+    try {
+      const user = await prisma.evidence.update({
+        where: {
+          id,
+        },
+        data: {
+          ...req.body,
+          updatedAt: new Date(),
+        },
+      });
+      return res.status(200).json(user);
+    } catch (err) {
+      return res.status(404).json('id not found');
+    }
+  }
+
   if (req.method === 'GET') {
     const authorizationHeader = req.headers.authorization;
     const token = authorizationHeader?.split('Bearer ')[1];
@@ -10,24 +45,8 @@ export default function handler(req, res) {
     } catch (error) {
       return res.status(401).json('unauthorized');
     }
-    const { id } = req.query;
-    const prisma = new PrismaClient();
 
-    async function main() {
-      await prisma.$connect();
-      try {
-        const user = await prisma.evidence.findUnique({
-          where: {
-            id,
-          },
-        });
-        return res.status(200).json(user);
-      } catch (err) {
-        return res.status(404).json('id not found');
-      }
-    }
-
-    main()
+    mainGet()
       .catch((e) => {
         throw e;
       })
@@ -42,28 +61,9 @@ export default function handler(req, res) {
     } catch (error) {
       return res.status(401).json('unauthorized');
     }
-    const { id } = req.query;
     const prisma = new PrismaClient();
 
-    async function main() {
-      await prisma.$connect();
-      try {
-        const user = await prisma.evidence.update({
-          where: {
-            id,
-          },
-          data: {
-            ...req.body,
-            updatedAt: new Date(),
-          },
-        });
-        return res.status(200).json(user);
-      } catch (err) {
-        return res.status(404).json('id not found');
-      }
-    }
-
-    main()
+    mainPatch()
       .catch((e) => {
         throw e;
       })
@@ -71,4 +71,11 @@ export default function handler(req, res) {
         await prisma.$disconnect();
       });
   }
+  return null;
 }
+
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};

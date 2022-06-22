@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import prisma from '../../../lib/prisma';
 
 export default function handler(req, res) {
   const authorizationHeader = req.headers.authorization;
@@ -7,7 +7,6 @@ export default function handler(req, res) {
   const verify = jwt.verify(token, process.env.JWT_KEY);
   const decoded = jwt.decode(token);
   const { id } = decoded;
-  const prisma = new PrismaClient();
   const { body } = req;
   const now = new Date();
 
@@ -34,3 +33,9 @@ export default function handler(req, res) {
       await prisma.$disconnect();
     });
 }
+
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};

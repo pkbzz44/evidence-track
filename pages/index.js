@@ -64,6 +64,8 @@ function Home() {
     onClose: onCloseDeleteDialog,
   } = useDisclosure();
   const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const [searchId, setSearchId] = useState(null);
+
   const [evidenceSearchId, setEvidenceSearchId] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagesCount, setPagesCount] = useState(1);
@@ -81,23 +83,23 @@ function Home() {
     }
   };
 
-  const fetchEvidences = async (page = 0) => {
+  const fetchEvidences = async ({ queryKey }) => {
+    const [key, page, id] = queryKey;
     try {
       const res = await AxiosInstance.get('/evidence', {
         params: {
-          evidenceId: evidenceSearchId !== '' ? evidenceSearchId : null,
-          page,
+          evidenceId: id !== '' ? id : null,
+          page: page - 1,
         },
       });
       return res.data;
-    } catch (error) {
-      return [];
-    }
+    } catch (error) {}
+    return [];
   };
 
   const { data: evidences, isLoading } = useQuery(
-    ['evidences data', currentPage],
-    () => fetchEvidences(currentPage - 1)
+    ['evidences data', currentPage, evidenceSearchId],
+    fetchEvidences
   );
 
   useEffect(() => {
@@ -114,7 +116,7 @@ function Home() {
   );
 
   const handleOnClickSearch = () => {
-    fetchEvidences(0);
+    setEvidenceSearchId(searchId);
   };
 
   const handleDelete = (evidence) => {
@@ -145,6 +147,7 @@ function Home() {
       default:
         break;
     }
+    return null;
   };
 
   if (isLoading || isLoadingAuth) {
@@ -170,12 +173,14 @@ function Home() {
         </Flex> */}
         <HStack justify='space-between' mb='4'>
           <InputGroup>
-            <InputLeftElement pointerEvents='none' children={<SearchIcon />} />
+            <InputLeftElement pointerEvents='none'>
+              <SearchIcon />
+            </InputLeftElement>
             <Input
               onKeyDown={(e) => e.key === 'Enter' && handleOnClickSearch()}
               placeholder='กรอกรหัสเพื่อค้นหา'
-              value={evidenceSearchId}
-              onChange={(e) => setEvidenceSearchId(e.target.value)}
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
             />
           </InputGroup>
           <Button colorScheme='green' onClick={handleOnClickSearch}>
@@ -280,7 +285,7 @@ function Home() {
             </PaginationContainer>
           </Pagination>
         </Stack>
-        {evidences.length === 0 && (
+        {evidences?.length === 0 && (
           <Alert status='error' w='100%'>
             <AlertIcon />
             <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
