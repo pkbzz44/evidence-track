@@ -6,7 +6,15 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Layout from '../components/layout';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retryDelay: 500,
+      retry: 1,
+    },
+  },
+});
 
 function MyApp({ Component, pageProps }) {
   return (

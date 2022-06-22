@@ -108,7 +108,10 @@ function Home() {
     qClient.invalidateQueries('evidences data');
   }, [currentPage]);
 
-  const { data: auth } = useQuery('auth data', fetchAuth);
+  const { data: auth, isLoading: isLoadingAuth } = useQuery(
+    'auth data',
+    fetchAuth
+  );
 
   const handleOnClickSearch = () => {
     fetchEvidences(0);
@@ -144,7 +147,7 @@ function Home() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingAuth) {
     return (
       <VStack mt='16'>
         <Skeleton width='80%' height='20px' />{' '}

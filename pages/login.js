@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import {
   Button,
   Center,
@@ -5,42 +6,49 @@ import {
   Heading,
   Input,
   VStack,
+  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
 import AxiosInstance from '../lib/api';
+
 if (typeof window !== 'undefined') {
   AxiosInstance.defaults.headers.common = {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
   };
 }
-const Login = () => {
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res = await AxiosInstance.get('checkAuth');
-        router.push('/');
-      } catch (error) {
-        // router.push('/login');
-      }
-    };
-    fetch();
-  }, []);
+function Login() {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const onSubmit = async (data) => {
-    try {
-      const res = await AxiosInstance.post('/login', data);
-      localStorage.setItem('token', res.data);
-      router.reload();
-    } catch (error) {
-      console.log(error);
+
+  const toast = useToast();
+  const { data, error } = useQuery('fetch auth', () =>
+    AxiosInstance.get('/checkAuth')
+  );
+
+  if (data?.status === 200) router.push('/');
+
+  const { mutate, isLoading: isLoggingIn } = useMutation(
+    (data) => AxiosInstance.post('/login', data),
+    {
+      onSuccess: (data) => {
+        localStorage.setItem('token', data.data);
+        router.reload();
+        toast({ title: 'เข้าสู่ระบบสำเร็จ', status: 'success' });
+      },
+      onError: () =>
+        toast({
+          title: 'ชื่อผู้ใช้ หรือ รหัสผ่านผิดพลาด กรุณาลองอีกครั้ง',
+          status: 'error',
+        }),
     }
+  );
+
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    mutate(data);
   };
 
   return (
@@ -56,13 +64,13 @@ const Login = () => {
             placeholder='กรุณากรอกรหัสผ่าน'
             {...register('password')}
           />
-          <Button colorScheme='blue' type='submit'>
+          <Button colorScheme='blue' type='submit' isLoading={isLoggingIn}>
             ยืนยัน
           </Button>
         </VStack>
       </form>
     </Container>
   );
-};
+}
 
 export default Login;
