@@ -1,3 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react/no-array-index-key */
 import {
   Container,
@@ -30,6 +34,11 @@ import {
   AlertTitle,
   AlertDescription,
   Stack,
+  Box,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  Center,
 } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from 'react-query';
 import { EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
@@ -46,6 +55,8 @@ import {
   PaginationContainer,
   PaginationPageGroup,
 } from '@ajna/pagination';
+import Image from 'next/image';
+import { QRCodeSVG } from 'qrcode.react';
 import { renderPoliceStation } from '../lib/helper';
 import AxiosInstance from '../lib/api';
 
@@ -62,6 +73,11 @@ function Home() {
     isOpen: isDeleteDialogOpen,
     onOpen: onOpenDeleteDialog,
     onClose: onCloseDeleteDialog,
+  } = useDisclosure();
+  const {
+    isOpen: isQrOpen,
+    onOpen: openQr,
+    onClose: closeQr,
   } = useDisclosure();
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [searchId, setSearchId] = useState(null);
@@ -126,6 +142,11 @@ function Home() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const onClickQr = (evidence) => {
+    openQr();
+    setSelectedEvidence(evidence);
   };
 
   const renderStatus = (status) => {
@@ -229,6 +250,12 @@ function Home() {
                   <Tr key={id}>
                     <Td>
                       <HStack>
+                        <img
+                          src='/images/scan.png'
+                          width={20}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => onClickQr(evidence)}
+                        />
                         <EditIcon
                           cursor='pointer'
                           onClick={() => router.push(`/${id}/edit`)}
@@ -338,6 +365,25 @@ function Home() {
           </AlertDialogOverlay>
         </AlertDialog>
       </Container>
+      <Modal isOpen={isQrOpen} onClose={closeQr}>
+        <ModalOverlay>
+          <ModalContent>
+            <Center p='8'>
+              <VStack spacing='8'>
+                <Text fontSize='xl' fontWeight='bolder' color='blue'>
+                  {selectedEvidence?.evidenceId}
+                </Text>
+                <QRCodeSVG
+                  value={`${window.location.href}${selectedEvidence?.id}/edit`}
+                />
+                <Button colorScheme='red' onClick={closeQr}>
+                  ปิด
+                </Button>
+              </VStack>
+            </Center>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
     </>
   );
 }
