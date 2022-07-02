@@ -54,7 +54,7 @@ function EditEvidence() {
         const res = await AxiosInstance.get('checkAuth');
         setAuth(res.data);
       } catch (error) {
-        router.push('/login');
+        router.push(`/login?next=${router.asPath}`);
       }
     };
     fetch();

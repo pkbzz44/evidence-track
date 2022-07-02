@@ -21,13 +21,19 @@ if (typeof window !== 'undefined') {
 }
 function Login() {
   const router = useRouter();
-
+  const { next } = router?.query;
   const toast = useToast();
   const { data } = useQuery('fetch auth', () =>
     AxiosInstance.get('/checkAuth')
   );
 
-  if (data?.status === 200) router.push('/');
+  if (data?.status === 200) {
+    if (next) {
+      router.push(next);
+    } else {
+      router.push('/');
+    }
+  }
 
   const { mutate, isLoading: isLoggingIn } = useMutation(
     (data) => AxiosInstance.post('/login', data),
