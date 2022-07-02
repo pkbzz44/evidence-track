@@ -54,11 +54,12 @@ function EditEvidence() {
         const res = await AxiosInstance.get('checkAuth');
         setAuth(res.data);
       } catch (error) {
-        router.push(`/login?next=${router.asPath}`);
+        if (!router.asPath.includes('id'))
+          router.push(`/login?next=${router.asPath}`);
       }
     };
     fetch();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetch = async () => {
