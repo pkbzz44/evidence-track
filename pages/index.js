@@ -376,7 +376,26 @@ function Home() {
                 <QRCodeSVG
                   value={`${window.location.href}${selectedEvidence?.id}/edit`}
                 />
-                <Button colorScheme='red' onClick={closeQr}>
+                <Button
+                  colorScheme='green'
+                  onClick={() => window.print()}
+                  sx={{
+                    '@media print': {
+                      display: 'none',
+                    },
+                  }}
+                >
+                  พิมพ์ QR Code
+                </Button>
+                <Button
+                  colorScheme='red'
+                  onClick={closeQr}
+                  sx={{
+                    '@media print': {
+                      display: 'none',
+                    },
+                  }}
+                >
                   ปิด
                 </Button>
               </VStack>

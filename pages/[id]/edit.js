@@ -15,6 +15,7 @@ import {
   CheckboxGroup,
   useToast,
   Skeleton,
+  Stack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -278,7 +279,7 @@ function EditEvidence() {
             errorBorderColor='crimson'
             value={techniques}
           >
-            <HStack>
+            <Stack direction={{ base: 'column', lg: 'row' }}>
               <Checkbox value='Superglue'>Superglue</Checkbox>
               <Checkbox value='R6G'>R6G</Checkbox>
               <Checkbox value='BY40'>BY40</Checkbox>
@@ -291,7 +292,7 @@ function EditEvidence() {
               <Checkbox value='Amidoblack '>Amidoblack </Checkbox>
               <Checkbox value='Powder'>Powder</Checkbox>
               <Checkbox value='etc'>อื่นๆ</Checkbox>
-            </HStack>
+            </Stack>
           </CheckboxGroup>
           <Text>ร้อยเวร</Text>
           <Input placeholder='กรุณากรอกชื่อร้อยเวร' {...register('LTName')} />
