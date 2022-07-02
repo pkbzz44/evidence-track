@@ -251,7 +251,7 @@ function Home() {
                     <Td>{storedAt}</Td>
                     <Td>{techniques?.map((t) => `${t} `)}</Td>
                     <Td>{LTName}</Td>
-                    <Td>{owner.name}</Td>
+                    <Td>{owner.fullName}</Td>
                   </Tr>
                 );
               })}

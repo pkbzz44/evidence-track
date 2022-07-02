@@ -334,7 +334,7 @@ function AdvancedSearch() {
                       <Td>{storedAt}</Td>
                       <Td>{technique}</Td>
                       <Td>{LTName}</Td>
-                      <Td>{owner.name}</Td>
+                      <Td>{owner.fullName}</Td>
                     </Tr>
                   );
                 })}
