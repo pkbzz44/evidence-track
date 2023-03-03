@@ -108,7 +108,7 @@ function DesktopNav() {
 
   return (
     <Stack direction='row' spacing={4} alignItems='center'>
-      <Image src='/images/logo.png' width='65px' height='65px' />
+      <Image src='/images/logo.jpg' width='250px' height='150px' />
       {router.pathname !== '/login' &&
         NAV_ITEMS.map((navItem) => (
           <Box key={navItem.label}>
